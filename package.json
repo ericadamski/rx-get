@@ -1,0 +1,21 @@
+{
+  "name": "rx-get",
+  "version": "1.0.0",
+  "description": "⛽ An observable wrapper around nodes http.get",
+  "main": "index.js",
+  "author": "Eric Adamski <er.adamski@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "precommit": "pretty-quick"
+  },
+  "devDependencies": {
+    "husky": "^0.14.3",
+    "jest": "^23.1.0",
+    "prettier": "^1.13.5",
+    "pretty-quick": "^1.6.0"
+  },
+  "dependencies": {
+    "rxjs": "^6.2.1"
+  }
+}
