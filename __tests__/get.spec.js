@@ -16,6 +16,14 @@ const mockResponse = {
   removeEventListener() {},
 };
 
+jest.mock('http', () => ({
+  request: jest.fn().mockImplementation((_, cb) => {
+    setImmediate(() => cb(mockResponse));
+
+    return mockRequest;
+  }),
+}));
+
 jest.mock('https', () => ({
   request: jest.fn().mockImplementation((_, cb) => {
     setImmediate(() => cb(mockResponse));
@@ -26,17 +34,27 @@ jest.mock('https', () => ({
 
 const { Observable } = require('rxjs');
 const https = require('https');
+const http = require('http');
 const get = require('../index.js');
 const URL = 'http://google.com/';
 
 describe('.get', () => {
   beforeEach(() => {
     mockRequest.end.mockClear();
+    http.request.mockClear();
     https.request.mockClear();
   });
 
   it('should return an Observable', () => {
     expect(get(URL)).toBeInstanceOf(Observable);
+  });
+
+  it('should call the correct protocol', () => {
+    return get('https://google.com')
+      .toPromise()
+      .then(() => {
+        expect(https.request).toHaveBeenCalledTimes(1);
+      });
   });
 
   it('should called request.end', () => {
@@ -51,8 +69,8 @@ describe('.get', () => {
     return get(URL)
       .toPromise()
       .then(() => {
-        expect(https.request).toHaveBeenCalledTimes(1);
-        expect(https.request.mock.calls[0][0]).toEqual({
+        expect(http.request).toHaveBeenCalledTimes(1);
+        expect(http.request.mock.calls[0][0]).toEqual({
           protocol: 'http:',
           host: 'google.com',
           hostname: 'google.com',
@@ -72,8 +90,8 @@ describe('.get', () => {
     })
       .toPromise()
       .then(() => {
-        expect(https.request).toHaveBeenCalledTimes(1);
-        expect(https.request.mock.calls[0][0]).toEqual({
+        expect(http.request).toHaveBeenCalledTimes(1);
+        expect(http.request.mock.calls[0][0]).toEqual({
           protocol: 'http:',
           method: 'POST',
           host: 'google.com',

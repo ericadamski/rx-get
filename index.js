@@ -1,5 +1,6 @@
 const url = require('url');
 const https = require('https');
+const http = require('http');
 const { merge, fromEvent, Subject } = require('rxjs');
 const { concatMap, tap, map, take } = require('rxjs/operators');
 
@@ -8,7 +9,7 @@ module.exports = function(uri, options = {}) {
   const { host, hostname, pathname, port, protocol } = url.parse(uri);
   let b = Buffer.alloc(0);
 
-  const request = https.request(
+  const request = (protocol === 'https:' ? https : http).request(
     Object.assign(
       {
         protocol,
