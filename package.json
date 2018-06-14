@@ -9,6 +9,15 @@
     "test": "jest",
     "precommit": "pretty-quick"
   },
+  "keywords": [
+    "http",
+    "https",
+    "nodejs",
+    "node",
+    "rxjs",
+    "rxjs6",
+    "observable"
+  ],
   "devDependencies": {
     "husky": "^0.14.3",
     "jest": "^23.1.0",
