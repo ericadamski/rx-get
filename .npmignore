@@ -2,3 +2,5 @@ __tests__
 .prettierrc
 .gitignore
 example.js
+coverage
+*.log
