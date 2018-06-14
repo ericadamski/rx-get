@@ -1,5 +1,9 @@
 # rx-get
 
+[![Size](http://img.badgesize.io/ericadamski/rx-get/master/index.js.svg?compression=gzip)](https://github.com/ngryman/badge-size)
+[![CircleCI](https://circleci.com/gh/ericadamski/rx-get.svg?style=shield)](https://circleci.com/gh/ericadamski/rx-get)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=shield)](https://github.com/prettier/prettier)
+
 ⛽️ An observable wrapper for nodes http.get
 
 ## Install
