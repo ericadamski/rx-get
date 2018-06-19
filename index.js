@@ -6,7 +6,7 @@ const { concatMap, tap, map, take } = require('rxjs/operators');
 
 module.exports = function(uri, options = {}) {
   const response$ = new Subject();
-  const { host, hostname, pathname, port, protocol } = url.parse(uri);
+  const { host, hostname, path, port, protocol } = url.parse(uri);
   let b = Buffer.alloc(0);
 
   const request = (protocol === 'https:' ? https : http).request(
@@ -16,7 +16,7 @@ module.exports = function(uri, options = {}) {
         host,
         hostname,
         port,
-        path: pathname,
+        path,
       },
       options,
       {

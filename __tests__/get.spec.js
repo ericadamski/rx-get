@@ -36,7 +36,7 @@ const { Observable } = require('rxjs');
 const https = require('https');
 const http = require('http');
 const get = require('../index.js');
-const URL = 'http://google.com/';
+const URL = 'http://google.com/?q=banana';
 
 describe('.get', () => {
   beforeEach(() => {
@@ -75,7 +75,7 @@ describe('.get', () => {
           host: 'google.com',
           hostname: 'google.com',
           port: null,
-          path: '/',
+          path: '/?q=banana',
           headers: {
             'user-agent': 'rx-get/1.0 (+https://github.com/ericadamski/rx-get)',
           },
@@ -97,7 +97,7 @@ describe('.get', () => {
           host: 'google.com',
           hostname: 'google.com',
           port: null,
-          path: '/',
+          path: '/?q=banana',
           headers: {
             'content-type': 'application/json',
             'user-agent': 'rx-get/1.0 (+https://github.com/ericadamski/rx-get)',
