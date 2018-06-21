@@ -4,7 +4,7 @@ get('https://api.github.com/emojis').subscribe({
   next({ progress, done, json }) {
     if (!done) return console.log(`Progress: ${progress}`);
 
-    console.log(json);
+    console.log(json());
   },
 });
 
@@ -29,6 +29,6 @@ get('https://api.github.com/graphql', {
   }),
 }).subscribe({
   next(response) {
-    console.log(response.json());
+    response.done && console.log(response.json());
   },
 });
