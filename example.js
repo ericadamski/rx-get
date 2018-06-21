@@ -1,9 +1,13 @@
 const get = require('./index.js');
 
-get('https://api.github.com/emojis').subscribe({
+get('https://api.github.com/emojis', {
+  onProgress(v) {
+    console.log(`Progress: ${v}`);
+  },
+}).subscribe({
   next({ status, json, text }) {
     console.log(status);
-    console.log(json());
+    // console.log(json());
   },
 });
 

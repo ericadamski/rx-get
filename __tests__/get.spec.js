@@ -1,10 +1,13 @@
-const mockResponseValue = JSON.stringify({ key: 'value' });
+const mockResponseValue = JSON.stringify({
+  key: 'value',
+});
 const mockRequest = {
   end: jest.fn(),
   write: jest.fn(),
 };
 
 const mockResponse = {
+  headers: { 'content-length': '100' },
   addEventListener(event, handler) {
     switch (event) {
       case 'data':
@@ -47,6 +50,16 @@ describe('.get', () => {
 
   it('should return an Observable', () => {
     expect(get(URL)).toBeInstanceOf(Observable);
+  });
+
+  it('should call onProgress if passed', () => {
+    const onProgress = jest.fn();
+
+    return get('https://google.com', { onProgress })
+      .toPromise()
+      .then(() => {
+        expect(onProgress).toHaveBeenCalledTimes(1);
+      });
   });
 
   it('should call the correct protocol', () => {

@@ -7,6 +7,7 @@ const { concatMap, tap, map, take } = require('rxjs/operators');
 module.exports = function(uri, options = {}) {
   const response$ = new Subject();
   const { host, hostname, path, port, protocol } = url.parse(uri);
+  let contentLength = 0;
   let b = Buffer.alloc(0);
 
   const request = (protocol === 'https:' ? https : http).request(
@@ -35,10 +36,17 @@ module.exports = function(uri, options = {}) {
   request.end();
 
   return response$.pipe(
+    tap(r => (contentLength = +r.headers['content-length'])),
     tap(r =>
-      fromEvent(r, 'data').subscribe(
-        c => (b = Buffer.concat([b, c], b.length + c.length))
-      )
+      fromEvent(r, 'data')
+        .pipe(
+          tap(
+            () =>
+              options.onProgress &&
+              options.onProgress((b.length / contentLength) * 100)
+          )
+        )
+        .subscribe(c => (b = Buffer.concat([b, c], b.length + c.length)))
     ),
     concatMap(r =>
       merge(
@@ -47,6 +55,8 @@ module.exports = function(uri, options = {}) {
             status: r.statusCode,
             statusText: r.statusMessage,
             headers: r.headers,
+            buffer: b,
+            body: r.body,
             json() {
               return JSON.parse(b.toString());
             },
