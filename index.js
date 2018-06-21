@@ -2,7 +2,14 @@ const url = require('url');
 const https = require('https');
 const http = require('http');
 const { merge, fromEvent, Subject } = require('rxjs');
-const { concatMap, tap, map, take } = require('rxjs/operators');
+const {
+  concatMap,
+  tap,
+  map,
+  takeUntil,
+  take,
+  switchMap,
+} = require('rxjs/operators');
 
 module.exports = function(uri, options = {}) {
   const response$ = new Subject();
@@ -36,43 +43,45 @@ module.exports = function(uri, options = {}) {
   request.end();
 
   return response$.pipe(
+    take(1),
     tap(r => (contentLength = +r.headers['content-length'])),
-    tap(r =>
-      fromEvent(r, 'data')
-        .pipe(
-          tap(
-            () =>
-              options.onProgress &&
-              options.onProgress((b.length / contentLength) * 100)
+    switchMap(r =>
+      fromEvent(r, 'data').pipe(
+        takeUntil(
+          merge(
+            fromEvent(r, 'end'),
+            fromEvent(r, 'error').pipe(
+              concatMap(e => {
+                // istanbul ignore next ⚠️ Very hard to test
+                return throwError(e);
+              })
+            )
           )
-        )
-        .subscribe(c => (b = Buffer.concat([b, c], b.length + c.length)))
-    ),
-    concatMap(r =>
-      merge(
-        fromEvent(r, 'end').pipe(
-          map(() => ({
-            status: r.statusCode,
-            statusText: r.statusMessage,
-            headers: r.headers,
-            buffer: b,
-            body: r.body,
-            json() {
-              return JSON.parse(b.toString());
-            },
-            text() {
-              return b.toString();
-            },
-          }))
         ),
-        fromEvent(r, 'error').pipe(
-          concatMap(e => {
-            // istanbul ignore next ⚠️ Very hard to test
-            return throwError(e);
-          })
-        )
+        map(c => {
+          b = Buffer.concat([b, c], b.length + c.length);
+          const progress = (b.length / contentLength) * 100;
+          const done = progress >= 100;
+
+          // istanbul ignore next ⚠️ Relatively hard to test
+          return done
+            ? {
+                status: r.statusCode,
+                statusText: r.statusMessage,
+                headers: r.headers,
+                body: b,
+                progress,
+                done,
+                json() {
+                  return JSON.parse(b.toString());
+                },
+                text() {
+                  return b.toString();
+                },
+              }
+            : { progress, done };
+        })
       )
-    ),
-    take(1)
+    )
   );
 };

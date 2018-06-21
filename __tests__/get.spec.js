@@ -7,13 +7,13 @@ const mockRequest = {
 };
 
 const mockResponse = {
-  headers: { 'content-length': '100' },
+  headers: { 'content-length': Buffer.from(mockResponseValue, 'ascii').length },
   addEventListener(event, handler) {
     switch (event) {
       case 'data':
         return handler(Buffer.from(mockResponseValue, 'ascii'));
       case 'end':
-        return handler();
+        return setImmediate(handler);
     }
   },
   removeEventListener() {},
@@ -36,6 +36,7 @@ jest.mock('https', () => ({
 }));
 
 const { Observable } = require('rxjs');
+const { last, toArray } = require('rxjs/operators');
 const https = require('https');
 const http = require('http');
 const get = require('../index.js');
@@ -50,16 +51,6 @@ describe('.get', () => {
 
   it('should return an Observable', () => {
     expect(get(URL)).toBeInstanceOf(Observable);
-  });
-
-  it('should call onProgress if passed', () => {
-    const onProgress = jest.fn();
-
-    return get('https://google.com', { onProgress })
-      .toPromise()
-      .then(() => {
-        expect(onProgress).toHaveBeenCalledTimes(1);
-      });
   });
 
   it('should call the correct protocol', () => {
