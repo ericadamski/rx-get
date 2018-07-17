@@ -14,7 +14,7 @@ type RxGetResponse = {
   body: Buffer;
   progress: number;
   done: boolean;
-  json: () => Object;
+  json: () => any;
   text: () => string;
 };
 
