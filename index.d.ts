@@ -18,7 +18,7 @@ type RxGetResponse = {
   text: () => string;
 };
 
-export function get(
+export default function get(
   url: string,
   options?: {
     protocol?: string;
