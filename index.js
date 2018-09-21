@@ -44,7 +44,11 @@ module.exports = function(uri, options = {}) {
 
   return response$.pipe(
     take(1),
-    tap(r => (contentLength = +r.headers['content-length'])),
+    tap(
+      r =>
+          r.headers['content-length'] &&
+          (contentLength = +r.headers['content-length'])
+    ),
     switchMap(r =>
       fromEvent(r, 'data').pipe(
         takeUntil(
