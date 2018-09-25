@@ -14,7 +14,7 @@ const {
 module.exports = function(uri, options = {}) {
   const response$ = new Subject();
   const { host, hostname, path, port, protocol } = url.parse(uri);
-  let contentLength = 0;
+  let contentLength = 1;
   let b = Buffer.alloc(0);
 
   const request = (protocol === 'https:' ? https : http).request(
@@ -44,7 +44,11 @@ module.exports = function(uri, options = {}) {
 
   return response$.pipe(
     take(1),
-    tap(r => (contentLength = +r.headers['content-length'])),
+    tap(
+      r =>
+        r.headers['content-length'] &&
+        (contentLength = +r.headers['content-length'])
+    ),
     switchMap(r =>
       fromEvent(r, 'data').pipe(
         takeUntil(

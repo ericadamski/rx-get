@@ -135,4 +135,18 @@ describe('.get', () => {
         expect(json()).toEqual({ key: 'value' });
       });
   });
+
+  it('should return data when content-length is undefined', () => {
+    mockResponse.headers = {
+      statusCode: 200,
+    };
+
+    return get(URL)
+      .toPromise()
+      .then(({ headers, done }) => {
+        expect(done).toBe(true);
+        expect(headers.statusCode).toBe(200);
+        expect(headers['content-length']).toBeUndefined();
+      });
+  });
 });
